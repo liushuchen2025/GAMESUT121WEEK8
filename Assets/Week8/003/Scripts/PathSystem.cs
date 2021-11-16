@@ -10,6 +10,11 @@ public class PathSystem : MonoBehaviour {
     System.Random random;
     public int seed = 0;
 
+    public GameObject blockPrefab;
+    public List<GameObject> blockList = new List<GameObject>();
+    public GameObject lootToSpawn;
+    public List<GameObject> lootList = new List<GameObject>();
+
     [Space]
     public bool animatedPath;
     public List<MyGridCell> gridCellList = new List<MyGridCell>();
@@ -58,20 +63,41 @@ public class PathSystem : MonoBehaviour {
     IEnumerator CreatePathRoutine() {
 
         gridCellList.Clear();
+        for (int i = 0; i<blockList.Count; i++)
+        {
+           Destroy(blockList[i]);
+        }
+        for (int i = 0; i < lootList.Count; i++)
+        {
+            Destroy(lootList[i]);
+        }
         Vector2 currentPosition = startLocation.transform.position;
         gridCellList.Add(new MyGridCell(currentPosition));
+        GameObject b = Instantiate(blockPrefab, currentPosition, Quaternion.identity);
+        blockList.Add(b);
 
         for (int i = 0; i < pathLength; i++) {
 
             int n = random.Next(100);
+            int l = random.Next(100);
 
             if (n.IsBetween(0, 49)) {
                 currentPosition = new Vector2(currentPosition.x + cellSize, currentPosition.y);
+                b = Instantiate(blockPrefab, currentPosition, Quaternion.identity);
+                blockList.Add(b);
             }
             else {
                 currentPosition = new Vector2(currentPosition.x, currentPosition.y + cellSize);
+                b = Instantiate(blockPrefab, currentPosition, Quaternion.identity);
+                blockList.Add(b);
             }
 
+            if (l.IsBetween(0, 8))
+            {
+                GameObject loot = Instantiate(lootToSpawn, currentPosition, Quaternion.identity);
+                lootList.Add(loot);
+            }
+            
             gridCellList.Add(new MyGridCell(currentPosition));
             yield return null;
         }
